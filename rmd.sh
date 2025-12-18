@@ -95,20 +95,26 @@ is_config_file() {
     return 1
 }
 
+# URL encode path for trashinfo (per XDG spec)
+url_encode_path() {
+    local path="$1"
+    # Use printf to URL encode, but keep / unencoded
+    printf '%s' "$path" | sed 's/%/%25/g; s/ /%20/g; s/!/%21/g; s/#/%23/g; s/\$/%24/g; s/&/%26/g; s/'\''/%27/g; s/(/%28/g; s/)/%29/g; s/*/%2A/g; s/+/%2B/g; s/,/%2C/g; s/:/%3A/g; s/;/%3B/g; s/=/%3D/g; s/?/%3F/g; s/@/%40/g; s/\[/%5B/g; s/\]/%5D/g'
+}
+
 # Create .trashinfo metadata file
 create_trashinfo() {
     local original_path="$1"
     local trash_name="$2"
     local info_file="$TRASH_INFO/${trash_name}.trashinfo"
     local deletion_date
+    local encoded_path
     
     deletion_date="$(date -u +%Y-%m-%dT%H:%M:%S)"
+    encoded_path="$(url_encode_path "$original_path")"
     
-    cat > "$info_file" <<EOF
-[Trash Info]
-Path=$original_path
-DeletionDate=$deletion_date
-EOF
+    # Ensure info file ends with newline (XDG spec requirement)
+    printf '[Trash Info]\nPath=%s\nDeletionDate=%s\n' "$encoded_path" "$deletion_date" > "$info_file"
 }
 
 # Move file to trash with conflict handling
