@@ -150,17 +150,23 @@ prompt_user() {
     
     case "$prompt_type" in
         "folder")
-            echo -n "$filename is a directory, remove (Y/n/D): " >&2
+            printf "%s is a directory, remove (Y/n/D): " "$filename" >&2
             ;;
         "config")
-            echo -n "Warning: This appears to be a hidden/config file. Continue? (Y/n/D): " >&2
+            printf "Warning: This appears to be a hidden/config file. Continue? (Y/n/D): " >&2
             ;;
         "delete")
-            echo -n "Delete $filename? (Y/n/D): " >&2
+            printf "Delete %s? (Y/n/D): " "$filename" >&2
             ;;
     esac
     
-    read -r response
+    # Flush stderr to ensure prompt appears before reading input
+    # Try to read from terminal directly if available, otherwise use stdin
+    if [[ -t 0 ]] && [[ -t 2 ]]; then
+        read -r response < /dev/tty 2>/dev/null || read -r response
+    else
+        read -r response
+    fi
     
     # Handle response (case-sensitive for 'D' - permanent delete requires explicit uppercase)
     case "${response,,}" in
