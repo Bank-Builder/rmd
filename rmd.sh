@@ -38,10 +38,11 @@ get_absolute_path() {
     fi
 }
 
-# Check if path is a system file
+# Check if path is a system file and return reason if protected
 is_system_file() {
     local path="$1"
     local abs_path
+    local reason=""
     
     # Get absolute path
     abs_path="$(get_absolute_path "$path")"
@@ -49,17 +50,23 @@ is_system_file() {
     # Check against protected directories
     for protected in "${PROTECTED_DIRS[@]}"; do
         if [[ "$abs_path" == "$protected"/* ]] || [[ "$abs_path" == "$protected" ]]; then
+            reason="protected system directory ($protected)"
+            echo "$reason"
             return 0
         fi
     done
     
     # Check if it's root's home directory
     if [[ "$abs_path" == "/root"/* ]] || [[ "$abs_path" == "/root" ]]; then
+        reason="protected system directory (/root)"
+        echo "$reason"
         return 0
     fi
     
     # Check if it's the current user's home directory (protect the home dir itself)
     if [[ "$abs_path" == "$HOME" ]]; then
+        reason="protected home directory"
+        echo "$reason"
         return 0
     fi
     
@@ -187,8 +194,10 @@ process_file() {
     fi
     
     # System file protection
-    if is_system_file "$file"; then
-        echo "rmd: cannot remove '$file': System file protection enabled" >&2
+    local protection_reason
+    protection_reason="$(is_system_file "$file")"
+    if [[ $? -eq 0 ]]; then
+        echo "rmd: cannot remove '$file': $protection_reason" >&2
         return 2
     fi
     
@@ -215,7 +224,7 @@ process_file() {
     case "$action" in
         "trash")
             if [[ "$needs_recursive" == true ]] && [[ "$RECURSIVE" != true ]]; then
-                echo "rmd: cannot remove '$file': Is a directory (use -r flag)" >&2
+                echo "rmd: cannot remove '$file': Is a directory (use -r or -R flag to remove directories)" >&2
                 return 1
             fi
             move_to_trash "$file"
@@ -223,7 +232,7 @@ process_file() {
         "delete")
             if [[ "$needs_recursive" == true ]] && [[ "$RECURSIVE" != true ]]; then
                 /bin/rm -r "$file" 2>/dev/null || {
-                    echo "rmd: cannot remove '$file': Is a directory (use -r flag)" >&2
+                    echo "rmd: cannot remove '$file': Is a directory (use -r or -R flag to remove directories)" >&2
                     return 1
                 }
             else
