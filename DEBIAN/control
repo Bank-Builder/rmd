@@ -5,7 +5,7 @@ Priority: optional
 Architecture: all
 Depends: bash (>= 4.0), coreutils
 Maintainer: Andrew Turpin <andrew@turpin.co.za>
-Homepage: https://github.com/aturpin/rmd
+Homepage: https://github.com/Bank-Builder/rmd
 Description: Safe rm wrapper with trash integration
  A lightweight bash script that wraps the rm command with safety features:
   - Prevents deletion of system files

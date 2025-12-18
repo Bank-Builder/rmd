@@ -1,6 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: rmd
-Source: https://github.com/aturpin/rmd
+Source: https://github.com/Bank-Builder/rmd
 
 Files: *
 Copyright: 2025 Andrew Turpin
