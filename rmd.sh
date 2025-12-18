@@ -150,13 +150,13 @@ prompt_user() {
     
     case "$prompt_type" in
         "folder")
-            echo -n "$filename is a directory, remove (Y/n/D): "
+            echo -n "$filename is a directory, remove (Y/n/D): " >&2
             ;;
         "config")
-            echo -n "Warning: This appears to be a hidden/config file. Continue? (Y/n/D): "
+            echo -n "Warning: This appears to be a hidden/config file. Continue? (Y/n/D): " >&2
             ;;
         "delete")
-            echo -n "Delete $filename? (Y/n/D): "
+            echo -n "Delete $filename? (Y/n/D): " >&2
             ;;
     esac
     
