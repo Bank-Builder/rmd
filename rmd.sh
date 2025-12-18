@@ -232,16 +232,12 @@ process_file() {
     
     case "$action" in
         "trash")
-            # For directories, we need recursive flag
-            if [[ "$needs_recursive" == true ]] && [[ "$RECURSIVE" != true ]]; then
-                # User confirmed via prompt, so use -r implicitly
-                move_to_trash "$file"
-            else
-                move_to_trash "$file"
-            fi
+            # mv handles directories automatically, so no need to check -r flag
+            # If user confirmed via prompt, proceed with move
+            move_to_trash "$file"
             ;;
         "delete")
-            # For directories, always use -r
+            # For directories, always use -r for permanent delete
             if [[ "$needs_recursive" == true ]]; then
                 /bin/rm -r ${VERBOSE:+-v} "$file" 2>/dev/null || {
                     echo "rmd: cannot remove '$file': Failed to remove directory" >&2
