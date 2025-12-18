@@ -131,7 +131,7 @@ move_to_trash() {
         ((counter++))
     done
     
-    # Move file/directory to trash
+    # Move file/directory to trash (mv handles directories automatically)
     if mv "$source" "$final_dest" 2>/dev/null; then
         create_trashinfo "$original_path" "$(basename "$final_dest")"
         [[ "$VERBOSE" == true ]] && echo "Moved '$source' to trash"
@@ -150,7 +150,7 @@ prompt_user() {
     
     case "$prompt_type" in
         "folder")
-            echo -n "This is a folder. Are you sure you want to delete it? (Y/n/D): "
+            echo -n "$filename is a directory, remove (Y/n/D): "
             ;;
         "config")
             echo -n "Warning: This appears to be a hidden/config file. Continue? (Y/n/D): "
@@ -203,10 +203,19 @@ process_file() {
     
     # Check if directory
     if [[ -d "$file" ]]; then
+        # Always prompt for directories, even without -r flag
         if [[ "$FORCE" != true ]] && [[ "$SKIP_PROMPTS" != true ]]; then
             action="$(prompt_user "$file" "folder")"
         else
-            action="trash"
+            # With -f flag, use trash but still need recursive flag
+            if [[ "$RECURSIVE" == true ]]; then
+                action="trash"
+            else
+                # Force mode without -r: still prompt or error?
+                # For safety, require -r even with -f for directories
+                echo "rmd: cannot remove '$file': Is a directory (use -r or -R flag to remove directories)" >&2
+                return 1
+            fi
         fi
         
         needs_recursive=true
@@ -223,20 +232,23 @@ process_file() {
     
     case "$action" in
         "trash")
+            # For directories, we need recursive flag
             if [[ "$needs_recursive" == true ]] && [[ "$RECURSIVE" != true ]]; then
-                echo "rmd: cannot remove '$file': Is a directory (use -r or -R flag to remove directories)" >&2
-                return 1
+                # User confirmed via prompt, so use -r implicitly
+                move_to_trash "$file"
+            else
+                move_to_trash "$file"
             fi
-            move_to_trash "$file"
             ;;
         "delete")
-            if [[ "$needs_recursive" == true ]] && [[ "$RECURSIVE" != true ]]; then
-                /bin/rm -r "$file" 2>/dev/null || {
-                    echo "rmd: cannot remove '$file': Is a directory (use -r or -R flag to remove directories)" >&2
+            # For directories, always use -r
+            if [[ "$needs_recursive" == true ]]; then
+                /bin/rm -r ${VERBOSE:+-v} "$file" 2>/dev/null || {
+                    echo "rmd: cannot remove '$file': Failed to remove directory" >&2
                     return 1
                 }
             else
-                /bin/rm ${RECURSIVE:+-r} ${VERBOSE:+-v} "$file" 2>/dev/null || /bin/rm "$file"
+                /bin/rm ${VERBOSE:+-v} "$file" 2>/dev/null || /bin/rm "$file"
             fi
             [[ "$VERBOSE" == true ]] && echo "Permanently deleted '$file'"
             ;;
