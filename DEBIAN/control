@@ -1,0 +1,17 @@
+Package: rmd
+Version: 1.0.0
+Section: utils
+Priority: optional
+Architecture: all
+Depends: bash (>= 4.0), coreutils
+Maintainer: Andrew Turpin <andrew@turpin.co.za>
+Homepage: https://github.com/aturpin/rmd
+Description: Safe rm wrapper with trash integration
+ A lightweight bash script that wraps the rm command with safety features:
+  - Prevents deletion of system files
+  - Warns about deleting folders and config files
+  - Moves files to GNOME trash instead of permanent deletion
+  - Provides Y/n/D prompt options
+ .
+ This tool helps prevent accidental data loss by moving deleted files
+ to the trash instead of permanently removing them.

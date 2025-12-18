@@ -1,0 +1,9 @@
+rmd (1.0.0-1) unstable; urgency=medium
+
+  * Initial release
+  * Safe rm wrapper with trash integration
+  * System file protection
+  * Config file warnings
+  * GNOME trash integration
+
+ -- Andrew Turpin <andrew@turpin.co.za>  Wed, 01 Jan 2025 00:00:00 +0000

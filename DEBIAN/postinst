@@ -1,0 +1,22 @@
+#!/bin/bash
+# Post-installation script for rmd package
+
+set -e
+
+# Install the script
+if [ -f /usr/local/bin/rmd.sh ]; then
+    chmod +x /usr/local/bin/rmd.sh
+    ln -sf /usr/local/bin/rmd.sh /usr/local/bin/rmd 2>/dev/null || true
+fi
+
+# Install bash completion if available
+if [ -d /etc/bash_completion.d ] && [ -f /usr/local/share/rmd/rmd.bash-completion ]; then
+    cp /usr/local/share/rmd/rmd.bash-completion /etc/bash_completion.d/rmd
+fi
+
+# Update man database if mandb is available
+if command -v mandb >/dev/null 2>&1; then
+    mandb >/dev/null 2>&1 || true
+fi
+
+exit 0

@@ -1,0 +1,23 @@
+# Bash completion for rmd command
+# To install: source this file or copy to /etc/bash_completion.d/rmd
+
+_rmd() {
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    
+    opts="-f --force -r -R --recursive -v --verbose -h --help"
+    
+    # If current word starts with -, complete with options
+    if [[ ${cur} == -* ]]; then
+        COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+        return 0
+    fi
+    
+    # Otherwise, complete with filenames
+    COMPREPLY=($(compgen -f -- ${cur}))
+    return 0
+}
+
+complete -F _rmd rmd

@@ -1,0 +1,16 @@
+#!/bin/bash
+# Post-removal script for rmd package
+
+set -e
+
+# Remove bash completion if it exists
+if [ -f /etc/bash_completion.d/rmd ]; then
+    rm -f /etc/bash_completion.d/rmd
+fi
+
+# Update man database if mandb is available
+if command -v mandb >/dev/null 2>&1; then
+    mandb >/dev/null 2>&1 || true
+fi
+
+exit 0

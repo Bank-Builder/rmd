@@ -1,0 +1,28 @@
+#!/usr/bin/make -f
+# Debian packaging rules for rmd
+# Copyright (c) 2025 Andrew Turpin
+
+export DH_VERBOSE = 1
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+%:
+	dh $@
+
+override_dh_auto_install:
+	# Install main script
+	install -d debian/rmd/usr/local/bin
+	install -m 755 rmd.sh debian/rmd/usr/local/bin/rmd
+	
+	# Install man page
+	install -d debian/rmd/usr/local/share/man/man1
+	install -m 644 usr/local/share/man/man1/rmd.1 debian/rmd/usr/local/share/man/man1/
+	
+	# Install bash completion
+	install -d debian/rmd/usr/local/share/rmd
+	install -m 644 rmd.bash-completion debian/rmd/usr/local/share/rmd/
+	
+	# Install bash completion to system location (via postinst)
+	install -d debian/rmd/etc/bash_completion.d
+
+override_dh_auto_build:
+	# No build step needed for bash script

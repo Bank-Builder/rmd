@@ -1,0 +1,105 @@
+.TH RMD 1 "2024" "rmd 1.0.0" "User Commands"
+.SH NAME
+rmd \- safe file removal with trash integration
+.SH SYNOPSIS
+.B rmd
+[\fIOPTION\fR]... \fIFILE\fR...
+.SH DESCRIPTION
+\fBrmd\fR is a safety wrapper around the standard \fBrm\fR command that provides
+additional protection against accidental data loss. Instead of permanently deleting
+files, \fBrmd\fR moves them to the GNOME trash, from where they can be recovered.
+
+.SH SAFETY FEATURES
+.TP
+.B System File Protection
+Prevents deletion of files in protected system directories such as /bin, /usr,
+/etc, /root, /sbin, /lib, /opt, /var, /sys, /proc, /dev, and /boot.
+
+.TP
+.B Folder Detection
+Detects when attempting to delete a directory and prompts for confirmation.
+
+.TP
+.B Config File Warnings
+Warns when attempting to delete hidden files or common configuration files.
+
+.TP
+.B Trash Integration
+Moves deleted files to ~/.local/share/Trash instead of permanently removing them,
+following the XDG Trash specification.
+
+.SH OPTIONS
+.TP
+.BR \-f ", " \-\-force
+Skip safety prompts. Files are still moved to trash unless 'D' is selected in
+the prompt.
+
+.TP
+.BR \-r ", " \-R ", " \-\-recursive
+Remove directories and their contents recursively.
+
+.TP
+.BR \-v ", " \-\-verbose
+Explain what is being done.
+
+.TP
+.BR \-h ", " \-\-help
+Display help information and exit.
+
+.SH PROMPTS
+When deleting files, \fBrmd\fR may prompt with the following options:
+.TP
+.B Y
+Move file to trash (default action).
+.TP
+.B n
+Cancel the operation.
+.TP
+.B D
+Permanently delete the file (bypass trash, uses actual \fBrm\fR).
+
+.SH EXAMPLES
+.TP
+Delete a single file:
+.B rmd file.txt
+
+.TP
+Delete a directory recursively:
+.B rmd -r directory/
+
+.TP
+Delete multiple files:
+.B rmd file1.txt file2.txt file3.txt
+
+.TP
+Skip prompts (still uses trash):
+.B rmd -f config.txt
+
+.SH EXIT STATUS
+.TP
+.B 0
+Success
+.TP
+.B 1
+User cancelled or file not found
+.TP
+.B 2
+System file protection triggered
+.TP
+.B 3
+Failed to create trash directories
+
+.SH SEE ALSO
+.BR rm (1),
+.BR trash-cli (1)
+
+.SH NOTES
+This is a safety wrapper. For permanent deletion without prompts, use \fBrm\fR directly.
+To alias \fBrm\fR to \fBrmd\fR, add the following to your ~/.bashrc or ~/.zshrc:
+.RS
+.PP
+alias rm='rmd'
+.RE
+
+.SH AUTHOR
+Written as a safety wrapper for the standard rm command.
